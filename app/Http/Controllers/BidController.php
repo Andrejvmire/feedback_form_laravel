@@ -17,7 +17,10 @@ class BidController extends Controller
      */
     public function index(Auth $auth)
     {
-        return view('bid.list');
+        $data = Bid::query()->where('user_id', '=', Auth::user()->id)->get();
+        return view('bid.list', [
+            "bids" => $data
+        ]);
     }
 
     /**
