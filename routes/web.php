@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BidController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,5 +18,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::get('/bid/form', [BidController::class, 'create'])->name('bid.form');
+
+Route::post("/bid/store", [BidController::class, 'store'])->name('bid.store');
+
+Route::get("/bid", [BidController::class, "index"])->name('bid');
 
 require __DIR__.'/auth.php';

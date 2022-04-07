@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBidRequest;
-use App\Http\Requests\UpdateBidRequest;
 use App\Models\Bid;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class BidController extends Controller
 {
@@ -15,31 +15,45 @@ class BidController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function index(Auth $auth): View
+    public function index(Auth $auth)
     {
-        var_dump($auth::user()->id);
-        return view('welcome');
+        return view('bid.list');
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
-        //
+        return view('bid.form');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreBidRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param \App\Http\Requests\StoreBidRequest $request
+     * @param Auth $auth
+     * @return Application|Factory|\Illuminate\Contracts\View\View
      */
-    public function store(StoreBidRequest $request)
+    public function store(StoreBidRequest $request, Auth $auth)
     {
-        //
+        $validated = $request->validated();
+        $file_name = null;
+        if ($request->hasFile('file')) {
+            $validated['file']->store('files');
+            $file_name = $validated["file"]->path();
+        }
+        Bid::create([
+            "name" => $validated["bid_name"],
+            "phone" => $validated["phone"],
+            "company" => $validated["company"],
+            "message" => $validated["message"],
+            "user_id" => $auth::user()->id,
+            "file_name" => $file_name
+        ]);
+        return redirect("bid");
     }
 
     /**
